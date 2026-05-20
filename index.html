@@ -4,657 +4,1086 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EduFlow</title>
-
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: Arial, sans-serif;
+:root {
+  --bg: #0f0f18;
+  --surface: #16172a;
+  --surface2: #1e2040;
+  --border: rgba(139,120,255,0.12);
+  --border2: rgba(139,120,255,0.22);
+  --purple: #a78bfa;
+  --purple2: #7c3aed;
+  --cyan: #38bdf8;
+  --text: #f0eeff;
+  --muted: #8b8aac;
+  --success: #34d399;
+  --warn: #fbbf24;
+  --sidebar-w: 220px;
+  --radius: 16px;
 }
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); display:flex; min-height:100vh; font-size:15px; }
 
-body {
-  background: #070b14;
-  color: white;
-  display: flex;
-  min-height: 100vh;
-}
-
+/* SIDEBAR */
 .sidebar {
-  width: 250px;
-  background: #0f172a;
-  padding: 25px;
-  position: fixed;
-  height: 100vh;
-  border-right: 1px solid #1e293b;
+  width:var(--sidebar-w); background:var(--surface); border-right:1px solid var(--border);
+  padding:28px 16px; display:flex; flex-direction:column; position:fixed; height:100vh; z-index:100;
 }
-
-.logo {
-  font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 40px;
-  color: #8b5cf6;
+.logo { font-size:22px; font-weight:700; color:var(--purple); margin-bottom:36px; padding:0 8px; letter-spacing:-0.5px; }
+.logo span { color:var(--cyan); }
+.nav-item {
+  display:flex; align-items:center; gap:10px; padding:11px 14px; border-radius:12px;
+  cursor:pointer; color:var(--muted); font-size:14px; font-weight:500; transition:.2s; margin-bottom:4px; border:none; background:none; width:100%; text-align:left;
 }
-
-.sidebar button {
-  width: 100%;
-  margin-bottom: 15px;
+.nav-item:hover { background:var(--surface2); color:var(--text); }
+.nav-item.active { background:rgba(139,92,246,0.18); color:var(--purple); }
+.nav-item svg { width:18px; height:18px; flex-shrink:0; }
+.sidebar-bottom { margin-top:auto; }
+.user-card {
+  background:var(--surface2); border:1px solid var(--border); border-radius:12px; padding:12px;
+  display:flex; align-items:center; gap:10px;
 }
+.avatar { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--purple2),var(--cyan)); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; flex-shrink:0; }
+.user-name { font-size:13px; font-weight:600; }
+.user-level { font-size:11px; color:var(--muted); }
 
-.main {
-  margin-left: 250px;
-  width: 100%;
-  padding: 30px;
+/* MAIN */
+.main { margin-left:var(--sidebar-w); flex:1; padding:30px; min-height:100vh; }
+.page { display:none; }
+.page.active { display:block; }
+
+/* TOP BAR */
+.topbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:28px; }
+.topbar h1 { font-size:26px; font-weight:700; letter-spacing:-0.5px; }
+.topbar h1 span { color:var(--muted); font-weight:400; }
+.search-bar {
+  display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border);
+  border-radius:12px; padding:9px 16px; flex:0 0 280px;
 }
+.search-bar input { background:none; border:none; color:var(--text); font-size:14px; outline:none; width:100%; }
+.search-bar svg { color:var(--muted); width:16px; height:16px; flex-shrink:0; }
 
-.page {
-  display: none;
+/* STAT CARDS */
+.stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:24px; }
+.stat-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px 20px;
+  display:flex; align-items:center; gap:14px; transition:.2s;
 }
+.stat-card:hover { border-color:var(--border2); transform:translateY(-2px); }
+.stat-icon { width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.stat-icon.p { background:rgba(167,139,250,0.15); color:var(--purple); }
+.stat-icon.c { background:rgba(52,211,153,0.15); color:var(--success); }
+.stat-icon.i { background:rgba(56,189,248,0.15); color:var(--cyan); }
+.stat-icon.t { background:rgba(251,191,36,0.15); color:var(--warn); }
+.stat-icon svg { width:20px; height:20px; }
+.stat-val { font-size:20px; font-weight:700; }
+.stat-label { font-size:12px; color:var(--muted); margin-top:2px; }
 
-.active {
-  display: block;
+/* GRID LAYOUT */
+.two-col { display:grid; grid-template-columns:1fr 340px; gap:20px; }
+.card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:22px; margin-bottom:20px; }
+.card-title { font-size:15px; font-weight:600; margin-bottom:16px; display:flex; align-items:center; justify-content:space-between; }
+.view-all { font-size:12px; color:var(--purple); cursor:pointer; display:flex; align-items:center; gap:4px; }
+
+/* CHART */
+.chart-wrap { display:flex; gap:8px; align-items:flex-end; height:160px; margin-top:8px; }
+.bar-group { flex:1; display:flex; gap:3px; align-items:flex-end; }
+.bar-seg { flex:1; border-radius:4px 4px 0 0; transition:.4s; min-height:4px; }
+.bar-seg.theory { background:rgba(139,92,246,0.5); }
+.bar-seg.practice { background:var(--cyan); }
+.bar-day { text-align:center; font-size:10px; color:var(--muted); margin-top:6px; }
+.chart-legend { display:flex; gap:16px; margin-top:12px; }
+.leg-item { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--muted); }
+.leg-dot { width:8px; height:8px; border-radius:2px; }
+
+/* PROGRESS BAR */
+.progress-wrap { background:rgba(255,255,255,0.07); border-radius:50px; height:7px; overflow:hidden; margin-top:8px; }
+.progress-fill { height:100%; border-radius:50px; background:linear-gradient(90deg,var(--purple2),var(--cyan)); transition:.6s; }
+
+/* COURSE CARD */
+.course-thumb {
+  width:100%; height:120px; border-radius:12px; margin-bottom:14px; display:flex; align-items:center; justify-content:center;
+  font-size:36px; position:relative; overflow:hidden;
 }
+.course-meta { display:flex; gap:16px; margin:8px 0; }
+.course-meta span { font-size:12px; color:var(--muted); display:flex; align-items:center; gap:4px; }
+.badge { padding:3px 10px; border-radius:50px; font-size:11px; font-weight:600; }
+.badge.beginner { background:rgba(52,211,153,0.15); color:var(--success); }
+.badge.intermediate { background:rgba(56,189,248,0.15); color:var(--cyan); }
+.badge.advanced { background:rgba(251,191,36,0.15); color:var(--warn); }
+.star { color:var(--warn); }
 
-.card {
-  background: #111827;
-  border: 1px solid #1f2937;
-  border-radius: 20px;
-  padding: 20px;
-  margin-bottom: 20px;
-  transition: .3s;
+/* BUTTONS */
+.btn {
+  padding:10px 18px; border:none; border-radius:10px; cursor:pointer; font-family:inherit;
+  font-size:13px; font-weight:600; transition:.2s; display:inline-flex; align-items:center; gap:6px;
 }
+.btn-primary { background:linear-gradient(90deg,var(--purple2),#6366f1); color:#fff; }
+.btn-primary:hover { opacity:.88; transform:scale(1.02); }
+.btn-ghost { background:var(--surface2); color:var(--text); border:1px solid var(--border); }
+.btn-ghost:hover { border-color:var(--border2); }
+.btn-sm { padding:7px 14px; font-size:12px; }
+.btn-danger { background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.2); }
+.btn-success { background:rgba(52,211,153,0.15); color:var(--success); border:1px solid rgba(52,211,153,0.2); }
 
-.card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 0 25px rgba(139,92,246,0.3);
+/* CALENDAR */
+.calendar { width:100%; }
+.cal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.cal-nav { background:none; border:1px solid var(--border); border-radius:8px; width:28px; height:28px; cursor:pointer; color:var(--muted); display:flex; align-items:center; justify-content:center; font-size:14px; }
+.cal-nav:hover { border-color:var(--border2); color:var(--text); }
+.cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:2px; text-align:center; }
+.cal-day-name { font-size:10px; color:var(--muted); padding:4px 0; font-weight:600; }
+.cal-cell { padding:6px 2px; font-size:12px; border-radius:8px; cursor:pointer; transition:.15s; }
+.cal-cell:hover { background:var(--surface2); }
+.cal-cell.today { background:var(--purple2); color:#fff; font-weight:700; }
+.cal-cell.other-month { color:rgba(139,138,172,0.4); }
+.cal-cell.has-event { position:relative; }
+.cal-cell.has-event::after { content:''; position:absolute; bottom:2px; left:50%; transform:translateX(-50%); width:4px; height:4px; border-radius:50%; background:var(--cyan); }
+
+/* SCHEDULE */
+.schedule-item { display:flex; gap:12px; align-items:center; padding:10px 0; border-bottom:1px solid var(--border); }
+.schedule-item:last-child { border-bottom:none; }
+.schedule-time { font-size:11px; color:var(--muted); min-width:48px; font-family:'DM Mono',monospace; }
+.schedule-dot { width:8px; height:8px; border-radius:50%; background:var(--purple); flex-shrink:0; }
+.schedule-name { font-size:13px; font-weight:500; }
+
+/* LESSON ITEM */
+.lesson-item { background:var(--surface2); border-radius:10px; padding:12px 14px; margin-top:10px; display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.lesson-item.done { opacity:.6; }
+.lesson-status { width:22px; height:22px; border-radius:50%; border:2px solid var(--border2); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.lesson-status.done { background:var(--success); border-color:var(--success); }
+
+/* TOAST */
+.toast { position:fixed; top:24px; right:24px; background:var(--surface); border:1px solid var(--purple); padding:14px 20px; border-radius:12px; font-size:14px; opacity:0; transition:.3s; z-index:999; box-shadow:0 8px 30px rgba(0,0,0,.4); pointer-events:none; }
+.toast.show { opacity:1; }
+
+/* ADMIN */
+.admin-input-row { display:flex; gap:10px; margin-bottom:20px; }
+.admin-input-row input { flex:1; background:var(--surface2); border:1px solid var(--border); color:var(--text); padding:11px 14px; border-radius:10px; font-size:14px; outline:none; font-family:inherit; }
+.admin-input-row input:focus { border-color:var(--border2); }
+
+/* COURSES PAGE */
+.courses-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
+
+/* GAUGE */
+.gauge-wrap { display:flex; flex-direction:column; align-items:center; padding:8px 0; }
+.gauge-label { font-size:28px; font-weight:700; margin-top:8px; }
+.gauge-sub { font-size:13px; color:var(--muted); }
+
+/* CERT */
+.cert-card { display:flex; align-items:center; gap:12px; padding:12px; background:var(--surface2); border-radius:12px; }
+.cert-icon { width:44px; height:44px; border-radius:10px; background:rgba(251,191,36,0.15); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0; }
+.cert-name { font-size:14px; font-weight:600; }
+.cert-sub { font-size:12px; color:var(--muted); }
+
+/* NOTIFICATION BADGE */
+.notif { position:absolute; top:-4px; right:-4px; width:8px; height:8px; border-radius:50%; background:#ef4444; }
+.icon-btn { background:var(--surface); border:1px solid var(--border); border-radius:10px; width:38px; height:38px; display:flex; align-items:center; justify-content:center; cursor:pointer; position:relative; transition:.2s; }
+.icon-btn:hover { border-color:var(--border2); }
+.icon-btn svg { width:18px; height:18px; }
+
+/* EVENT TYPE BUTTONS */
+.ev-type-btn {
+  padding:7px 12px; border-radius:8px; border:1px solid var(--border); background:var(--surface2);
+  color:var(--muted); font-size:12px; cursor:pointer; transition:.15s; font-family:inherit;
 }
+.ev-type-btn:hover { border-color:var(--border2); color:var(--text); }
+.ev-type-btn.active { border-color:var(--purple); background:rgba(139,92,246,0.15); color:var(--purple); }
 
-h1 {
-  margin-bottom: 25px;
+/* EVENT DOT COLORS */
+.ev-dot-aula { background:var(--purple); }
+.ev-dot-estudo { background:var(--cyan); }
+.ev-dot-prova { background:#f87171; }
+.ev-dot-outro { background:var(--warn); }
+
+/* DAY CELL SELECTED */
+.cal-cell.selected { background:rgba(139,92,246,0.25); color:var(--purple); font-weight:600; }
+.cal-cell.selected.today { background:var(--purple2); color:#fff; }
+
+/* EVENT LIST ITEM */
+.ev-item { display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:10px;background:var(--surface2);margin-bottom:8px;cursor:pointer;transition:.15s; }
+.ev-item:hover { background:rgba(139,92,246,0.1); }
+.ev-dot { width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:5px; }
+.ev-time { font-size:11px;color:var(--muted);font-family:'DM Mono',monospace;white-space:nowrap; }
+.ev-name { font-size:13px;font-weight:500;line-height:1.4; }
+.ev-desc { font-size:11px;color:var(--muted);margin-top:2px; }
+
+/* BIG CALENDAR GRID */
+.big-cal-grid { display:grid;grid-template-columns:repeat(7,1fr);gap:4px; }
+.big-cal-cell {
+  min-height:80px;border-radius:10px;padding:8px;cursor:pointer;transition:.15s;
+  border:1px solid transparent;position:relative;
 }
+.big-cal-cell:hover { background:var(--surface2);border-color:var(--border); }
+.big-cal-cell.today { border-color:var(--purple2);background:rgba(124,58,237,0.08); }
+.big-cal-cell.selected { border-color:var(--purple);background:rgba(139,92,246,0.12); }
+.big-cal-cell.other-month { opacity:0.35; }
+.big-cal-num { font-size:13px;font-weight:600;margin-bottom:4px; }
+.big-cal-cell.today .big-cal-num { color:var(--purple); }
+.big-cal-ev { font-size:10px;padding:2px 6px;border-radius:4px;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.big-cal-ev.aula { background:rgba(167,139,250,0.2);color:var(--purple); }
+.big-cal-ev.estudo { background:rgba(56,189,248,0.2);color:var(--cyan); }
+.big-cal-ev.prova { background:rgba(248,113,113,0.2);color:#f87171; }
+.big-cal-ev.outro { background:rgba(251,191,36,0.2);color:var(--warn); }
 
-h2 {
-  margin-bottom: 10px;
+/* COLORS for course thumbs */
+.thumb-1 { background:linear-gradient(135deg,#312e81,#4338ca); }
+.thumb-2 { background:linear-gradient(135deg,#065f46,#059669); }
+.thumb-3 { background:linear-gradient(135deg,#7c2d12,#ea580c); }
+.thumb-4 { background:linear-gradient(135deg,#1e3a5f,#0284c7); }
+.thumb-5 { background:linear-gradient(135deg,#4a1d6b,#9333ea); }
+
+@media(max-width:900px) {
+  :root { --sidebar-w: 70px; }
+  .logo { font-size:16px; }
+  .nav-item span { display:none; }
+  .nav-label { display:none; }
+  .stats-row { grid-template-columns:1fr 1fr; }
+  .two-col { grid-template-columns:1fr; }
 }
-
-input {
-  width: 100%;
-  padding: 14px;
-  border-radius: 12px;
-  border: none;
-  background: #1e293b;
-  color: white;
-  margin-bottom: 15px;
-}
-
-button {
-  padding: 12px 20px;
-  border: none;
-  border-radius: 12px;
-  background: linear-gradient(90deg,#7c3aed,#38bdf8);
-  color: white;
-  cursor: pointer;
-  transition: .3s;
-}
-
-button:hover {
-  opacity: .9;
-  transform: scale(1.02);
-}
-
-.auth {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  min-height: 100vh;
-}
-
-.auth-card {
-  width: 400px;
-  background: #111827;
-  padding: 40px;
-  border-radius: 25px;
-  box-shadow: 0 0 35px rgba(139,92,246,0.2);
-}
-
-.auth-card h1 {
-  text-align: center;
-  margin-bottom: 25px;
-}
-
-.progress-bar {
-  width: 100%;
-  height: 12px;
-  background: #1e293b;
-  border-radius: 50px;
-  overflow: hidden;
-  margin-top: 10px;
-}
-
-.progress {
-  height: 100%;
-  background: linear-gradient(90deg,#7c3aed,#38bdf8);
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit,minmax(300px,1fr));
-  gap: 20px;
-}
-
-.lesson {
-  background: #1e293b;
-  padding: 15px;
-  border-radius: 12px;
-  margin-top: 12px;
-}
-
-.lesson button {
-  margin-top: 10px;
-}
-
-.toast {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: #111827;
-  border: 1px solid #7c3aed;
-  padding: 15px 20px;
-  border-radius: 12px;
-  box-shadow: 0 0 20px rgba(139,92,246,0.3);
-  opacity: 0;
-  transition: .4s;
-  z-index: 999;
-}
-
-.toast.show {
-  opacity: 1;
-}
-
-.chart {
-  margin-top: 20px;
-  height: 220px;
-  display: flex;
-  align-items: end;
-  gap: 15px;
-}
-
-.bar {
-  flex: 1;
-  background: linear-gradient(180deg,#7c3aed,#38bdf8);
-  border-radius: 12px 12px 0 0;
-}
-
-.small {
-  color: #94a3b8;
-  font-size: 14px;
-}
-
-@media(max-width: 900px) {
-
-  .sidebar {
-    width: 100px;
-    padding: 15px;
-  }
-
-  .logo {
-    font-size: 18px;
-  }
-
-  .main {
-    margin-left: 100px;
-  }
-
-  .sidebar button {
-    font-size: 12px;
-    padding: 10px;
-  }
-
-}
-
 </style>
 </head>
 <body>
 
 <div class="toast" id="toast"></div>
 
-<div id="authScreen" class="auth">
+<div class="sidebar">
+  <div class="logo">Edu<span>Flow</span></div>
 
-  <div class="auth-card">
+  <button class="nav-item active" onclick="openPage('dashboard',this)">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    <span>Dashboard</span>
+  </button>
+  <button class="nav-item" onclick="openPage('courses',this)">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+    <span>Meus Cursos</span>
+  </button>
+  <button class="nav-item" onclick="openPage('certificates',this)">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+    <span>Certificados</span>
+  </button>
+  <button class="nav-item" onclick="openPage('schedule',this)">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+    <span>Agenda</span>
+  </button>
+  <button class="nav-item" onclick="openPage('admin',this)">
+    <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+    <span>Admin</span>
+  </button>
 
-    <h1>EduFlow</h1>
-
-    <div id="loginArea">
-
-      <input type="email" id="loginEmail" placeholder="Email">
-      <input type="password" id="loginPassword" placeholder="Senha">
-
-      <button onclick="login()">Entrar</button>
-
-      <br><br>
-
-      <p>
-        Não possui conta?
-        <a href="#" onclick="showRegister()" style="color:#38bdf8;">
-          Cadastre-se
-        </a>
-      </p>
-
+  <div class="sidebar-bottom">
+    <div class="user-card">
+      <div class="avatar" id="sidebarAvatar">TW</div>
+      <div>
+        <div class="user-name" id="sidebarName">Theresa W.</div>
+        <div class="user-level">Iniciante</div>
+      </div>
     </div>
-
-    <div id="registerArea" style="display:none;">
-
-      <input type="text" id="registerName" placeholder="Nome">
-      <input type="email" id="registerEmail" placeholder="Email">
-      <input type="password" id="registerPassword" placeholder="Senha">
-
-      <button onclick="register()">Cadastrar</button>
-
-      <br><br>
-
-      <p>
-        Já possui conta?
-        <a href="#" onclick="showLogin()" style="color:#38bdf8;">
-          Fazer Login
-        </a>
-      </p>
-
-    </div>
-
   </div>
-
 </div>
 
-<div id="app" style="display:none; width:100%;">
+<div class="main">
 
-  <div class="sidebar">
+  <!-- DASHBOARD -->
+  <div id="dashboard" class="page active">
+    <div class="topbar">
+      <h1>Olá, <span id="greetName">Theresa</span> 👋</h1>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div class="search-bar">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          <input type="text" placeholder="Buscar curso...">
+        </div>
+        <div class="icon-btn"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg><div class="notif"></div></div>
+      </div>
+    </div>
 
-    <div class="logo">EduFlow</div>
+    <div class="stats-row" id="statsRow"></div>
 
-    <button onclick="openPage('dashboard')">Dashboard</button>
-    <button onclick="openPage('courses')">Cursos</button>
-    <button onclick="openPage('admin')">Admin</button>
-    <button onclick="logout()">Sair</button>
+    <div class="two-col">
+      <div>
+        <!-- Time Spending Chart -->
+        <div class="card">
+          <div class="card-title">
+            Tempo de Estudo
+            <div style="display:flex;gap:8px;">
+              <button class="btn btn-ghost btn-sm" onclick="switchChart('week',this)" style="background:var(--surface2)">Semana</button>
+              <button class="btn btn-ghost btn-sm" onclick="switchChart('month',this)">Mês</button>
+            </div>
+          </div>
+          <div class="chart-wrap" id="studyChart"></div>
+          <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:4px;" id="chartLabels"></div>
+          <div class="chart-legend">
+            <div class="leg-item"><div class="leg-dot" style="background:rgba(139,92,246,0.5)"></div>Teoria</div>
+            <div class="leg-item"><div class="leg-dot" style="background:var(--cyan)"></div>Prática</div>
+          </div>
+        </div>
 
+        <!-- Recent Activity -->
+        <div class="card">
+          <div class="card-title">
+            Atividade Recente
+            <span class="view-all" onclick="openPage('courses',document.querySelector('.nav-item:nth-child(3)'))">Ver tudo →</span>
+          </div>
+          <div class="courses-grid" id="recentActivity" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr))"></div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div>
+        <!-- Average Course Rate -->
+        <div class="card">
+          <div class="card-title">Taxa de Conclusão</div>
+          <div class="gauge-wrap">
+            <svg width="160" height="90" viewBox="0 0 160 90">
+              <path d="M 10 85 A 70 70 0 0 1 150 85" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="14" stroke-linecap="round"/>
+              <path id="gaugeFill" d="M 10 85 A 70 70 0 0 1 150 85" fill="none" stroke="url(#gGrad)" stroke-width="14" stroke-linecap="round" stroke-dasharray="220" stroke-dashoffset="220"/>
+              <defs>
+                <linearGradient id="gGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#7c3aed"/>
+                  <stop offset="100%" stop-color="#38bdf8"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="gauge-label" id="gaugeVal">0%</div>
+            <div class="gauge-sub">Média de progresso</div>
+          </div>
+        </div>
+
+        <!-- Calendar -->
+        <div class="card">
+          <div class="card-title">Calendário</div>
+          <div class="calendar" id="calendarWidget"></div>
+        </div>
+
+        <!-- Upcoming Events -->
+        <div class="card">
+          <div class="card-title">
+            Próximos Eventos
+            <span class="view-all" onclick="openPage('schedule',document.querySelectorAll('.nav-item')[3])">Ver agenda →</span>
+          </div>
+          <div id="dashUpcoming"></div>
+        </div>
+
+        <!-- Certificates -->
+        <div class="card">
+          <div class="card-title">
+            Certificados
+            <span class="view-all" onclick="openPage('certificates',document.querySelector('.nav-item:nth-child(4)'))">Ver tudo →</span>
+          </div>
+          <div id="dashCerts"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="main">
+  <!-- MEUS CURSOS -->
+  <div id="courses" class="page">
+    <div class="topbar">
+      <h1>Meus <span>Cursos</span></h1>
+    </div>
+    <div id="coursesContainer"></div>
+  </div>
 
-    <div id="dashboard" class="page active">
+  <!-- CERTIFICADOS -->
+  <div id="certificates" class="page">
+    <div class="topbar">
+      <h1>Certificados</h1>
+    </div>
+    <div class="card" id="certList"></div>
+  </div>
 
-      <h1>Dashboard</h1>
-
-      <div class="grid" id="dashboardCourses"></div>
-
-      <div class="card">
-
-        <h2>Gráfico de Progresso</h2>
-
-        <div class="chart" id="chart"></div>
-
+  <!-- AGENDA -->
+  <div id="schedule" class="page">
+    <div class="topbar">
+      <h1>Agenda</h1>
+      <button class="btn btn-primary" onclick="openEventModal(null)">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 4v16m8-8H4"/></svg>
+        Novo Evento
+      </button>
+    </div>
+    <div class="two-col" style="grid-template-columns:1fr 300px;">
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-title" style="margin-bottom:20px;">
+          <div style="display:flex;align-items:center;gap:12px;">
+            <button class="cal-nav" onclick="changeMonth(-1)">‹</button>
+            <span id="bigCalMonthLabel" style="font-size:15px;font-weight:600;min-width:160px;text-align:center;"></span>
+            <button class="cal-nav" onclick="changeMonth(1)">›</button>
+          </div>
+          <button class="btn btn-ghost btn-sm" onclick="goToday()">Hoje</button>
+        </div>
+        <div id="bigCalendarGrid"></div>
       </div>
-
+      <div>
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title" id="selectedDayTitle">Eventos do Dia</div>
+          <div id="selectedDayEvents" style="min-height:80px;"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Próximos Eventos</div>
+          <div id="upcomingEvents"></div>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <div id="courses" class="page">
-
-      <h1>Meus Cursos</h1>
-
-      <div id="coursesContainer"></div>
-
+  <!-- MODAL DE EVENTO -->
+  <div id="eventModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(4px);">
+    <div style="background:var(--surface);border:1px solid var(--border2);border-radius:20px;padding:28px;width:420px;max-width:90vw;box-shadow:0 20px 60px rgba(0,0,0,.5);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;">
+        <div style="font-size:17px;font-weight:700;" id="modalTitle">Novo Evento</div>
+        <button onclick="closeEventModal()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px;line-height:1;padding:4px;">✕</button>
+      </div>
+      <input type="hidden" id="editEventId">
+      <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Título</label>
+      <input type="text" id="evTitle" placeholder="Nome do evento ou aula" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:10px;font-size:14px;outline:none;font-family:inherit;margin-bottom:14px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;">
+        <div>
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Data</label>
+          <input type="date" id="evDate" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:10px;font-size:14px;outline:none;font-family:inherit;color-scheme:dark;">
+        </div>
+        <div>
+          <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Horário</label>
+          <input type="time" id="evTime" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:10px;font-size:14px;outline:none;font-family:inherit;color-scheme:dark;">
+        </div>
+      </div>
+      <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Tipo</label>
+      <div style="display:flex;gap:8px;margin-bottom:16px;" id="evTypeRow">
+        <button class="ev-type-btn active" data-type="aula" onclick="selectType(this)">📚 Aula</button>
+        <button class="ev-type-btn" data-type="estudo" onclick="selectType(this)">📖 Estudo</button>
+        <button class="ev-type-btn" data-type="prova" onclick="selectType(this)">📝 Prova</button>
+        <button class="ev-type-btn" data-type="outro" onclick="selectType(this)">📌 Outro</button>
+      </div>
+      <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Descrição (opcional)</label>
+      <textarea id="evDesc" placeholder="Detalhes do evento..." rows="2" style="width:100%;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:11px 14px;border-radius:10px;font-size:14px;outline:none;font-family:inherit;resize:vertical;margin-bottom:18px;"></textarea>
+      <div style="display:flex;gap:10px;">
+        <button class="btn btn-primary" style="flex:1;" onclick="saveEvent()">Salvar Evento</button>
+        <button class="btn btn-ghost" onclick="closeEventModal()">Cancelar</button>
+      </div>
     </div>
+  </div>
 
-    <div id="admin" class="page">
-
-      <h1>Painel Administrativo</h1>
-
-      <div class="card">
-
-        <input type="text" id="courseInput" placeholder="Nome do curso">
-
-        <button onclick="addCourse()">
-          Adicionar Curso
+  <!-- ADMIN -->
+  <div id="admin" class="page">
+    <div class="topbar">
+      <h1>Painel <span>Admin</span></h1>
+    </div>
+    <div class="card">
+      <div class="card-title">Adicionar Curso</div>
+      <div class="admin-input-row">
+        <input type="text" id="courseInput" placeholder="Nome do curso (ex: Python Avançado)">
+        <button class="btn btn-primary" onclick="addCourse()">
+          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path d="M12 4v16m8-8H4"/></svg>
+          Adicionar
         </button>
-
       </div>
-
-      <div id="adminCourses"></div>
-
     </div>
-
+    <div id="adminCourses"></div>
   </div>
 
 </div>
 
 <script>
-function showToast(message) {
-  const toast = document.getElementById('toast');
-  toast.innerText = message;
-  toast.classList.add('show');
-  setTimeout(() => {
-    toast.classList.remove('show');
-  }, 3000);
+const COLORS = ['thumb-1','thumb-2','thumb-3','thumb-4','thumb-5'];
+const EMOJIS = ['💻','🎨','🔬','📐','🎵','📊','🌍','✍️'];
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 3000);
 }
 
-function saveCourses(courses) {
-  localStorage.setItem('eduflow_courses', JSON.stringify(courses));
-}
+function saveCourses(c) { localStorage.setItem('ef_courses', JSON.stringify(c)); }
+function getCourses() { return JSON.parse(localStorage.getItem('ef_courses')) || []; }
 
-function getCourses() {
-  return JSON.parse(localStorage.getItem('eduflow_courses')) || [];
-}
-
-function seedCourses() {
-  if (!localStorage.getItem('eduflow_courses')) {
-    const mock = [
-      {
-        id: Date.now(),
-        name: 'JavaScript Moderno',
-        modules: [
-          {
-            title: 'Fundamentos',
-            lessons: [
-              {
-                title: 'Introdução ao JavaScript',
-                completed: false
-              },
-              {
-                title: 'Variáveis e Tipos',
-                completed: false
-              }
-            ]
-          }
-        ]
-      }
-    ];
-    saveCourses(mock);
+function seed() {
+  if (!localStorage.getItem('ef_courses')) {
+    saveCourses([
+      { id: 1, name: 'JavaScript Moderno', emoji: '💻', color: 0, rating: 4.5, hours: 24, sections: 3, modules: [
+        { title: 'Fundamentos', lessons: [
+          { title: 'Introdução ao JavaScript', completed: true },
+          { title: 'Variáveis e Tipos', completed: true },
+          { title: 'Funções e Escopo', completed: false }
+        ]},
+        { title: 'ES6+', lessons: [
+          { title: 'Arrow Functions', completed: false },
+          { title: 'Promises e Async/Await', completed: false }
+        ]}
+      ]},
+      { id: 2, name: 'UI/UX Design', emoji: '🎨', color: 1, rating: 4.0, hours: 32, sections: 4, modules: [
+        { title: 'Princípios de Design', lessons: [
+          { title: 'Teoria das Cores', completed: true },
+          { title: 'Tipografia', completed: false }
+        ]}
+      ]},
+      { id: 3, name: 'Python para Dados', emoji: '📊', color: 3, rating: 4.8, hours: 40, sections: 5, modules: [
+        { title: 'Básico de Python', lessons: [
+          { title: 'Sintaxe Python', completed: false },
+          { title: 'Pandas e NumPy', completed: false }
+        ]}
+      ]}
+    ]);
+  }
+  if (!localStorage.getItem('ef_user')) {
+    localStorage.setItem('ef_user', JSON.stringify({ name: 'Theresa W.', initials: 'TW' }));
   }
 }
+seed();
 
-seedCourses();
+function loadUser() {
+  const u = JSON.parse(localStorage.getItem('ef_user') || '{"name":"Theresa W.","initials":"TW"}');
+  document.getElementById('sidebarAvatar').textContent = u.initials;
+  document.getElementById('sidebarName').textContent = u.name;
+  document.getElementById('greetName').textContent = u.name.split(' ')[0];
+}
+loadUser();
 
-function showRegister() {
-  document.getElementById('loginArea').style.display = 'none';
-  document.getElementById('registerArea').style.display = 'block';
+function calcProgress(course) {
+  let total = 0, done = 0;
+  course.modules.forEach(m => m.lessons.forEach(l => { total++; if(l.completed) done++; }));
+  return total ? Math.round((done/total)*100) : 0;
 }
 
-function showLogin() {
-  document.getElementById('registerArea').style.display = 'none';
-  document.getElementById('loginArea').style.display = 'block';
+function openPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  renderPage(name);
 }
 
-function register() {
-  const user = {
-    name: document.getElementById('registerName').value,
-    email: document.getElementById('registerEmail').value,
-    password: document.getElementById('registerPassword').value
-  };
-
-  if (!user.name || !user.email || !user.password) {
-    return showToast('Preencha todos os campos');
-  }
-
-  localStorage.setItem('eduflow_user', JSON.stringify(user));
-
-  showToast('Conta criada com sucesso');
-
-  showLogin();
+function renderPage(name) {
+  if (name === 'dashboard') renderDashboard();
+  if (name === 'courses') renderCourses();
+  if (name === 'certificates') renderCertificates();
+  if (name === 'schedule') renderSchedule();
+  if (name === 'admin') renderAdmin();
 }
 
-function login() {
-  const email = document.getElementById('loginEmail').value;
-  const password = document.getElementById('loginPassword').value;
-
-  const user = JSON.parse(localStorage.getItem('eduflow_user'));
-
-  if (!user) {
-    return showToast('Crie uma conta primeiro');
-  }
-
-  if (user.email === email && user.password === password) {
-    document.getElementById('authScreen').style.display = 'none';
-    document.getElementById('app').style.display = 'flex';
-
-    renderDashboard();
-    renderCourses();
-    renderAdmin();
-
-    showToast('Login realizado');
-  } else {
-    showToast('Email ou senha inválidos');
-  }
-}
-
-function logout() {
-  document.getElementById('authScreen').style.display = 'flex';
-  document.getElementById('app').style.display = 'none';
-}
-
-function openPage(page) {
-  document.querySelectorAll('.page').forEach(p => {
-    p.classList.remove('active');
-  });
-
-  document.getElementById(page).classList.add('active');
-}
-
-function calculateProgress(course) {
-  let total = 0;
-  let completed = 0;
-
-  course.modules.forEach(module => {
-    module.lessons.forEach(lesson => {
-      total++;
-      if (lesson.completed) completed++;
-    });
-  });
-
-  return Math.floor((completed / total) * 100) || 0;
-}
-
+// ---- DASHBOARD ----
 function renderDashboard() {
-  const container = document.getElementById('dashboardCourses');
-  const chart = document.getElementById('chart');
-
-  container.innerHTML = '';
-  chart.innerHTML = '';
-
   const courses = getCourses();
+  let totalLessons = 0, doneLessons = 0;
+  courses.forEach(c => c.modules.forEach(m => m.lessons.forEach(l => { totalLessons++; if(l.completed) doneLessons++; })));
+  const inProgress = courses.filter(c => { const p=calcProgress(c); return p>0&&p<100; }).length;
+  const completed = courses.filter(c => calcProgress(c)===100).length;
+  const avgProgress = courses.length ? Math.round(courses.reduce((a,c) => a+calcProgress(c),0)/courses.length) : 0;
 
-  courses.forEach(course => {
-    const progress = calculateProgress(course);
+  document.getElementById('statsRow').innerHTML = `
+    <div class="stat-card"><div class="stat-icon p"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></div><div><div class="stat-val">${courses.length}</div><div class="stat-label">Cursos Totais</div></div></div>
+    <div class="stat-card"><div class="stat-icon c"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div><div class="stat-val">${completed}</div><div class="stat-label">Concluídos</div></div></div>
+    <div class="stat-card"><div class="stat-icon i"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div><div class="stat-val">${inProgress}</div><div class="stat-label">Em Progresso</div></div></div>
+    <div class="stat-card"><div class="stat-icon t"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><div><div class="stat-val">${doneLessons * 2}h</div><div class="stat-label">Tempo de Estudo</div></div></div>
+  `;
 
-    container.innerHTML += `
-      <div class="card">
-        <h2>${course.name}</h2>
+  renderChart('week');
 
-        <p class="small">${progress}% concluído</p>
-
-        <div class="progress-bar">
-          <div class="progress" style="width:${progress}%"></div>
-        </div>
-
-        <br>
-
-        <button onclick="openPage('courses')">
-          Continuar Estudando
-        </button>
+  // Recent Activity
+  const ra = document.getElementById('recentActivity');
+  ra.innerHTML = courses.slice(0,3).map((c,i) => {
+    const p = calcProgress(c);
+    const stars = '★'.repeat(Math.floor(c.rating||4)) + '☆'.repeat(5-Math.floor(c.rating||4));
+    return `<div class="card" style="margin-bottom:0;cursor:pointer;" onclick="openPage('courses',document.querySelectorAll('.nav-item')[1])">
+      <div class="course-thumb ${COLORS[c.color%5]}">${c.emoji||'📚'}</div>
+      <div style="font-weight:600;font-size:14px;margin-bottom:6px;">${c.name}</div>
+      <div class="course-meta">
+        <span>${c.sections||c.modules.length} módulos</span>
+        <span>${c.modules.reduce((a,m)=>a+m.lessons.length,0)} aulas</span>
       </div>
-    `;
+      <div style="font-size:12px;color:var(--warn);margin-bottom:8px;">${stars} ${(c.rating||4).toFixed(1)}</div>
+      <div class="progress-wrap"><div class="progress-fill" style="width:${p}%"></div></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:5px;">${p}% concluído</div>
+    </div>`;
+  }).join('');
 
-    chart.innerHTML += `
-      <div class="bar" style="height:${progress * 2}px"></div>
-    `;
-  });
+  // Gauge
+  const gaugeEl = document.getElementById('gaugeFill');
+  const gaugeVal = document.getElementById('gaugeVal');
+  const dashOffset = 220 - (220 * avgProgress / 100);
+  setTimeout(() => { gaugeEl.style.strokeDashoffset = dashOffset; gaugeEl.style.transition='stroke-dashoffset 1s ease'; }, 100);
+  gaugeVal.textContent = avgProgress + '%';
+
+  renderCalendar('calendarWidget');
+
+  // Upcoming events on dashboard
+  const todayStr = new Date().toISOString().split('T')[0];
+  const upcomingEvs = getEvents().filter(e => e.date >= todayStr).sort((a,b) => a.date.localeCompare(b.date)||(a.time||'').localeCompare(b.time||'')).slice(0,3);
+  document.getElementById('dashUpcoming').innerHTML = upcomingEvs.length
+    ? upcomingEvs.map(e => {
+        const [ey,em,ed] = e.date.split('-');
+        const dl = new Date(ey,em-1,ed).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
+        return `<div class="ev-item" onclick="selectDay('${e.date}');openPage('schedule',document.querySelectorAll('.nav-item')[3])">
+          <div class="ev-dot ev-dot-${e.type}"></div>
+          <div><div class="ev-name">${e.title}</div><div class="ev-time" style="font-size:11px;">${dl}${e.time?' · '+e.time:''}</div></div>
+        </div>`;
+      }).join('')
+    : `<div style="color:var(--muted);font-size:13px;text-align:center;padding:12px 0;">Sem eventos próximos.</div>`;
+
+  // Certs preview
+  const certs = courses.filter(c => calcProgress(c) === 100);
+  document.getElementById('dashCerts').innerHTML = certs.length
+    ? certs.map(c => `<div class="cert-card" style="margin-bottom:8px;"><div class="cert-icon">🏆</div><div><div class="cert-name">${c.name}</div><div class="cert-sub">Certificado de Conclusão</div></div></div>`).join('')
+    : `<div style="color:var(--muted);font-size:13px;text-align:center;padding:16px;">Conclua um curso para ganhar seu certificado!</div>`;
 }
 
+const weekData = [
+  [30,50],[45,60],[20,40],[60,80],[35,55],[25,45],[50,70]
+];
+const days = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
+
+function renderChart(mode) {
+  const chart = document.getElementById('studyChart');
+  const labels = document.getElementById('chartLabels');
+  const data = mode === 'week' ? weekData : weekData.map(([a,b]) => [a*4,b*4]);
+  const max = Math.max(...data.map(([a,b]) => a+b));
+  chart.innerHTML = data.map(([a,b]) => {
+    const total = a+b;
+    const h = Math.round((total/max)*140);
+    const ph = Math.round((a/total)*h);
+    const th = h - ph;
+    return `<div class="bar-group"><div class="bar-seg theory" style="height:${th}px"></div><div class="bar-seg practice" style="height:${ph}px"></div></div>`;
+  }).join('');
+  labels.innerHTML = days.map(d => `<div class="bar-day">${d}</div>`).join('');
+}
+
+function switchChart(mode, btn) {
+  document.querySelectorAll('.card .btn-ghost').forEach(b => b.style.background='');
+  btn.style.background = 'var(--surface2)';
+  renderChart(mode);
+}
+
+// ---- CALENDAR ----
+function renderCalendar(containerId) {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const firstDay = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month+1, 0).getDate();
+  const daysInPrev = new Date(year, month, 0).getDate();
+  const monthName = now.toLocaleString('pt-BR', {month:'long', year:'numeric'});
+  const events = getEvents();
+  const eventDays = new Set(events.filter(e => {
+    const [ey,em] = e.date.split('-');
+    return parseInt(ey)===year && parseInt(em)-1===month;
+  }).map(e => parseInt(e.date.split('-')[2])));
+
+  let html = `<div class="cal-header">
+    <button class="cal-nav">‹</button>
+    <span style="font-size:13px;font-weight:600;">${monthName.charAt(0).toUpperCase()+monthName.slice(1)}</span>
+    <button class="cal-nav">›</button>
+  </div>
+  <div class="cal-grid">
+    ${['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'].map(d => `<div class="cal-day-name">${d}</div>`).join('')}
+  `;
+
+  const startDay = firstDay === 0 ? 6 : firstDay - 1;
+  for (let i = startDay-1; i >= 0; i--) {
+    html += `<div class="cal-cell other-month">${daysInPrev-i}</div>`;
+  }
+  for (let d = 1; d <= daysInMonth; d++) {
+    const isToday = d === now.getDate();
+    const hasEvent = eventDays.has(d);
+    const dateStr = `${year}-${pad2(month+1)}-${pad2(d)}`;
+    html += `<div class="cal-cell ${isToday?'today':''} ${hasEvent&&!isToday?'has-event':''}" onclick="jumpToAgendaDay('${dateStr}')" title="${hasEvent?'Ver eventos':''}">${d}</div>`;
+  }
+  html += '</div>';
+  document.getElementById(containerId).innerHTML = html;
+}
+
+function jumpToAgendaDay(dateStr) {
+  calSelectedDate = dateStr;
+  const [y,m] = dateStr.split('-');
+  calViewYear = parseInt(y);
+  calViewMonth = parseInt(m)-1;
+  openPage('schedule', document.querySelectorAll('.nav-item')[3]);
+}
+
+// ---- COURSES ----
 function renderCourses() {
-  const container = document.getElementById('coursesContainer');
-
-  container.innerHTML = '';
-
   const courses = getCourses();
-
-  courses.forEach(course => {
-    const progress = calculateProgress(course);
-
-    let modulesHTML = '';
-
-    course.modules.forEach((module, moduleIndex) => {
-      let lessonsHTML = '';
-
-      module.lessons.forEach((lesson, lessonIndex) => {
-        lessonsHTML += `
-          <div class="lesson">
-            <h3>${lesson.title}</h3>
-
-            <p class="small">
-              ${lesson.completed ? 'Concluída' : 'Pendente'}
-            </p>
-
-            <button onclick="completeLesson(${course.id}, ${moduleIndex}, ${lessonIndex})">
-              ${lesson.completed ? 'Finalizada' : 'Concluir Aula'}
-            </button>
+  const container = document.getElementById('coursesContainer');
+  if (!courses.length) {
+    container.innerHTML = `<div class="card" style="text-align:center;padding:40px;color:var(--muted);">Nenhum curso ainda. Adicione um no painel Admin!</div>`;
+    return;
+  }
+  container.innerHTML = courses.map(course => {
+    const p = calcProgress(course);
+    const totalLessons = course.modules.reduce((a,m) => a+m.lessons.length, 0);
+    const doneLessons = course.modules.reduce((a,m) => a+m.lessons.filter(l=>l.completed).length, 0);
+    let modulesHTML = course.modules.map((mod, mi) => {
+      let lessonsHTML = mod.lessons.map((les, li) => `
+        <div class="lesson-item ${les.completed?'done':''}">
+          <div style="display:flex;align-items:center;gap:10px;flex:1;">
+            <div class="lesson-status ${les.completed?'done':''}">
+              ${les.completed ? '<svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="white" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>' : ''}
+            </div>
+            <div>
+              <div style="font-size:13px;font-weight:500;">${les.title}</div>
+              <div style="font-size:11px;color:var(--muted);">${les.completed?'Concluída':'Pendente'}</div>
+            </div>
           </div>
-        `;
-      });
+          ${!les.completed ? `<button class="btn btn-success btn-sm" onclick="completeLesson(${course.id},${mi},${li})">Concluir</button>` : ''}
+        </div>`).join('');
+      return `<div class="card" style="margin-top:0;">
+        <div class="card-title">${mod.title}</div>
+        ${lessonsHTML}
+        <button class="btn btn-ghost btn-sm" style="margin-top:12px;" onclick="addLesson(${course.id},${mi})">+ Adicionar aula</button>
+      </div>`;
+    }).join('');
 
-      modulesHTML += `
-        <div class="card">
-          <h2>${module.title}</h2>
-          ${lessonsHTML}
+    return `<div class="card" style="margin-bottom:24px;">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
+        <div class="course-thumb ${COLORS[course.color%5]}" style="width:64px;height:64px;font-size:24px;border-radius:12px;flex-shrink:0;">${course.emoji||'📚'}</div>
+        <div style="flex:1;">
+          <div style="font-size:18px;font-weight:700;">${course.name}</div>
+          <div style="font-size:13px;color:var(--muted);margin:4px 0;">${doneLessons}/${totalLessons} aulas concluídas · ${p}%</div>
+          <div class="progress-wrap"><div class="progress-fill" style="width:${p}%"></div></div>
         </div>
-      `;
-    });
-
-    container.innerHTML += `
-      <div class="card">
-        <h2>${course.name}</h2>
-
-        <p>${progress}% concluído</p>
-
-        <div class="progress-bar">
-          <div class="progress" style="width:${progress}%"></div>
-        </div>
-
-        <br>
-
+        <button class="btn btn-ghost btn-sm" onclick="addModule(${course.id})">+ Módulo</button>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;">
         ${modulesHTML}
       </div>
-    `;
-  });
+    </div>`;
+  }).join('');
 }
 
-function completeLesson(courseId, moduleIndex, lessonIndex) {
+function completeLesson(courseId, mi, li) {
   const courses = getCourses();
-
-  const course = courses.find(c => c.id === courseId);
-
-  course.modules[moduleIndex].lessons[lessonIndex].completed = true;
-
+  const c = courses.find(c => c.id === courseId);
+  c.modules[mi].lessons[li].completed = true;
   saveCourses(courses);
-
   renderCourses();
-  renderDashboard();
-
-  showToast('Aula concluída');
-}
-
-function addCourse() {
-  const input = document.getElementById('courseInput');
-
-  if (!input.value) {
-    return showToast('Digite o nome do curso');
-  }
-
-  const courses = getCourses();
-
-  courses.push({
-    id: Date.now(),
-    name: input.value,
-    modules: []
-  });
-
-  saveCourses(courses);
-
-  input.value = '';
-
-  renderAdmin();
-  renderCourses();
-  renderDashboard();
-
-  showToast('Curso adicionado');
-}
-
-function renderAdmin() {
-  const container = document.getElementById('adminCourses');
-
-  container.innerHTML = '';
-
-  const courses = getCourses();
-
-  courses.forEach(course => {
-    container.innerHTML += `
-      <div class="card">
-        <h2>${course.name}</h2>
-
-        <button onclick="addModule(${course.id})">
-          Adicionar Módulo
-        </button>
-      </div>
-    `;
-  });
+  toast('✅ Aula concluída!');
 }
 
 function addModule(courseId) {
-  const title = prompt('Nome do módulo');
-
+  const title = prompt('Nome do módulo:');
   if (!title) return;
-
   const courses = getCourses();
-
-  const course = courses.find(c => c.id === courseId);
-
-  course.modules.push({
-    title,
-    lessons: []
-  });
-
+  const c = courses.find(c => c.id === courseId);
+  c.modules.push({ title, lessons: [] });
   saveCourses(courses);
+  renderCourses();
+  toast('📂 Módulo criado!');
+  setTimeout(() => addLesson(courseId, c.modules.length - 1), 300);
+}
 
+function addLesson(courseId, mi) {
+  const title = prompt('Nome da aula:');
+  if (!title) return;
+  const courses = getCourses();
+  const c = courses.find(c => c.id === courseId);
+  c.modules[mi].lessons.push({ title, completed: false });
+  saveCourses(courses);
+  renderCourses();
+  toast('📝 Aula adicionada!');
+}
+
+// ---- CERTIFICATES ----
+function renderCertificates() {
+  const certs = getCourses().filter(c => calcProgress(c) === 100);
+  document.getElementById('certList').innerHTML = certs.length
+    ? certs.map(c => `<div class="cert-card" style="margin-bottom:12px;">
+        <div class="cert-icon">🏆</div>
+        <div style="flex:1;">
+          <div class="cert-name">${c.name}</div>
+          <div class="cert-sub">Certificado de Conclusão · ${new Date().toLocaleDateString('pt-BR')}</div>
+        </div>
+        <button class="btn btn-ghost btn-sm">Baixar</button>
+      </div>`).join('')
+    : `<div style="text-align:center;padding:40px;color:var(--muted);">Nenhum certificado ainda. Conclua um curso completo!</div>`;
+}
+
+// ---- EVENTS / AGENDA ----
+let calViewYear, calViewMonth, calSelectedDate;
+
+function getEvents() { return JSON.parse(localStorage.getItem('ef_events') || '[]'); }
+function saveEvents(e) { localStorage.setItem('ef_events', JSON.stringify(e)); }
+
+function seedEvents() {
+  if (!localStorage.getItem('ef_events')) {
+    const now = new Date();
+    const y = now.getFullYear(), m = now.getMonth();
+    const pad = n => String(n).padStart(2,'0');
+    saveEvents([
+      { id: 1, title: 'JavaScript — Arrow Functions', date: `${y}-${pad(m+1)}-${pad(now.getDate())}`, time: '10:00', type: 'aula', desc: 'Módulo ES6+ do curso JS Moderno' },
+      { id: 2, title: 'UI/UX — Teoria das Cores', date: `${y}-${pad(m+1)}-${pad(now.getDate())}`, time: '14:00', type: 'aula', desc: '' },
+      { id: 3, title: 'Revisão de Prova', date: `${y}-${pad(m+1)}-${pad(Math.min(now.getDate()+2,28))}`, time: '09:00', type: 'estudo', desc: 'Revisar conceitos de Promises' },
+      { id: 4, title: 'Prova de Python', date: `${y}-${pad(m+1)}-${pad(Math.min(now.getDate()+5,28))}`, time: '15:00', type: 'prova', desc: 'Pandas e NumPy' },
+    ]);
+  }
+}
+seedEvents();
+
+function renderSchedule() {
+  const now = new Date();
+  calViewYear = calViewYear || now.getFullYear();
+  calViewMonth = calViewMonth !== undefined ? calViewMonth : now.getMonth();
+  calSelectedDate = calSelectedDate || `${now.getFullYear()}-${pad2(now.getMonth()+1)}-${pad2(now.getDate())}`;
+  renderBigCalendar();
+  renderSelectedDay();
+  renderUpcoming();
+}
+
+function pad2(n) { return String(n).padStart(2,'0'); }
+
+function changeMonth(dir) {
+  calViewMonth += dir;
+  if (calViewMonth > 11) { calViewMonth = 0; calViewYear++; }
+  if (calViewMonth < 0) { calViewMonth = 11; calViewYear--; }
+  renderBigCalendar();
+}
+
+function goToday() {
+  const now = new Date();
+  calViewYear = now.getFullYear();
+  calViewMonth = now.getMonth();
+  calSelectedDate = `${now.getFullYear()}-${pad2(now.getMonth()+1)}-${pad2(now.getDate())}`;
+  renderBigCalendar();
+  renderSelectedDay();
+}
+
+function renderBigCalendar() {
+  const now = new Date();
+  const firstDay = new Date(calViewYear, calViewMonth, 1).getDay();
+  const daysInMonth = new Date(calViewYear, calViewMonth+1, 0).getDate();
+  const daysInPrev = new Date(calViewYear, calViewMonth, 0).getDate();
+  const startDay = firstDay === 0 ? 6 : firstDay - 1;
+  const events = getEvents();
+  const monthNames = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+  document.getElementById('bigCalMonthLabel').textContent = `${monthNames[calViewMonth]} ${calViewYear}`;
+
+  let html = `<div class="big-cal-grid">
+    ${['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'].map(d => `<div style="text-align:center;font-size:11px;color:var(--muted);font-weight:600;padding:6px 0;">${d}</div>`).join('')}
+  `;
+
+  // prev month cells
+  for (let i = startDay-1; i >= 0; i--) {
+    const d = daysInPrev - i;
+    const dateStr = `${calViewYear}-${pad2(calViewMonth)}-${pad2(d)}`;
+    html += `<div class="big-cal-cell other-month" onclick="selectDay('${dateStr}')"><div class="big-cal-num">${d}</div></div>`;
+  }
+
+  // current month
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${calViewYear}-${pad2(calViewMonth+1)}-${pad2(d)}`;
+    const isToday = d === now.getDate() && calViewMonth === now.getMonth() && calViewYear === now.getFullYear();
+    const isSelected = dateStr === calSelectedDate;
+    const dayEvents = events.filter(e => e.date === dateStr).slice(0,3);
+    const evHTML = dayEvents.map(e => `<div class="big-cal-ev ${e.type}">${e.time ? e.time+' ' : ''}${e.title}</div>`).join('');
+    html += `<div class="big-cal-cell ${isToday?'today':''} ${isSelected?'selected':''}" onclick="selectDay('${dateStr}')">
+      <div class="big-cal-num">${d}</div>
+      ${evHTML}
+    </div>`;
+  }
+
+  // fill remaining
+  const total = startDay + daysInMonth;
+  const remaining = total % 7 === 0 ? 0 : 7 - (total % 7);
+  for (let d = 1; d <= remaining; d++) {
+    const dateStr = `${calViewYear}-${pad2(calViewMonth+2)}-${pad2(d)}`;
+    html += `<div class="big-cal-cell other-month" onclick="selectDay('${dateStr}')"><div class="big-cal-num">${d}</div></div>`;
+  }
+  html += '</div>';
+  document.getElementById('bigCalendarGrid').innerHTML = html;
+}
+
+function selectDay(dateStr) {
+  calSelectedDate = dateStr;
+  renderBigCalendar();
+  renderSelectedDay();
+}
+
+function renderSelectedDay() {
+  if (!calSelectedDate) return;
+  const [y,m,d] = calSelectedDate.split('-');
+  const dateObj = new Date(y, m-1, d);
+  const label = dateObj.toLocaleDateString('pt-BR', { weekday:'long', day:'numeric', month:'long' });
+  document.getElementById('selectedDayTitle').innerHTML = `
+    <span style="text-transform:capitalize;">${label}</span>
+    <button class="btn btn-ghost btn-sm" onclick="openEventModal('${calSelectedDate}')">+ Evento</button>
+  `;
+  const events = getEvents().filter(e => e.date === calSelectedDate).sort((a,b) => (a.time||'').localeCompare(b.time||''));
+  const container = document.getElementById('selectedDayEvents');
+  if (!events.length) {
+    container.innerHTML = `<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px 0;">Nenhum evento neste dia.<br><span style="font-size:12px;">Clique em "+ Evento" para adicionar.</span></div>`;
+    return;
+  }
+  container.innerHTML = events.map(e => `
+    <div class="ev-item" onclick="openEventModal(null, ${e.id})">
+      <div class="ev-dot ev-dot-${e.type}"></div>
+      <div style="flex:1;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="ev-name">${e.title}</div>
+          <div class="ev-time">${e.time||''}</div>
+        </div>
+        ${e.desc ? `<div class="ev-desc">${e.desc}</div>` : ''}
+      </div>
+      <button onclick="event.stopPropagation();deleteEvent(${e.id})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;padding:2px 4px;" title="Remover">✕</button>
+    </div>`).join('');
+}
+
+function renderUpcoming() {
+  const today = new Date().toISOString().split('T')[0];
+  const events = getEvents().filter(e => e.date >= today).sort((a,b) => a.date.localeCompare(b.date) || (a.time||'').localeCompare(b.time||'')).slice(0,5);
+  const container = document.getElementById('upcomingEvents');
+  if (!events.length) {
+    container.innerHTML = `<div style="color:var(--muted);font-size:13px;text-align:center;padding:16px 0;">Sem próximos eventos.</div>`;
+    return;
+  }
+  container.innerHTML = events.map(e => {
+    const [y,m,d] = e.date.split('-');
+    const dateLabel = new Date(y,m-1,d).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'});
+    return `<div class="ev-item" onclick="selectDay('${e.date}');openPage('schedule',document.querySelectorAll('.nav-item')[3])">
+      <div class="ev-dot ev-dot-${e.type}"></div>
+      <div style="flex:1;">
+        <div class="ev-name">${e.title}</div>
+        <div class="ev-time" style="font-size:11px;">${dateLabel}${e.time?' · '+e.time:''}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ---- MODAL ----
+let selectedEventType = 'aula';
+
+function openEventModal(dateStr, editId) {
+  const modal = document.getElementById('eventModal');
+  modal.style.display = 'flex';
+  document.getElementById('editEventId').value = editId || '';
+  document.getElementById('evTitle').value = '';
+  document.getElementById('evDesc').value = '';
+  document.getElementById('evTime').value = '';
+  selectedEventType = 'aula';
+  document.querySelectorAll('.ev-type-btn').forEach(b => b.classList.toggle('active', b.dataset.type === 'aula'));
+
+  if (editId) {
+    const ev = getEvents().find(e => e.id === editId);
+    if (ev) {
+      document.getElementById('modalTitle').textContent = 'Editar Evento';
+      document.getElementById('evTitle').value = ev.title;
+      document.getElementById('evDate').value = ev.date;
+      document.getElementById('evTime').value = ev.time || '';
+      document.getElementById('evDesc').value = ev.desc || '';
+      selectedEventType = ev.type;
+      document.querySelectorAll('.ev-type-btn').forEach(b => b.classList.toggle('active', b.dataset.type === ev.type));
+      return;
+    }
+  }
+
+  document.getElementById('modalTitle').textContent = 'Novo Evento';
+  if (dateStr) {
+    document.getElementById('evDate').value = dateStr;
+  } else {
+    const now = new Date();
+    document.getElementById('evDate').value = `${now.getFullYear()}-${pad2(now.getMonth()+1)}-${pad2(now.getDate())}`;
+  }
+}
+
+function closeEventModal() {
+  document.getElementById('eventModal').style.display = 'none';
+}
+
+function selectType(btn) {
+  document.querySelectorAll('.ev-type-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  selectedEventType = btn.dataset.type;
+}
+
+function saveEvent() {
+  const title = document.getElementById('evTitle').value.trim();
+  if (!title) { toast('Digite o nome do evento'); return; }
+  const date = document.getElementById('evDate').value;
+  if (!date) { toast('Selecione uma data'); return; }
+
+  const events = getEvents();
+  const editId = document.getElementById('editEventId').value;
+
+  if (editId) {
+    const idx = events.findIndex(e => e.id == editId);
+    if (idx !== -1) {
+      events[idx] = { ...events[idx], title, date, time: document.getElementById('evTime').value, type: selectedEventType, desc: document.getElementById('evDesc').value.trim() };
+    }
+  } else {
+    events.push({ id: Date.now(), title, date, time: document.getElementById('evTime').value, type: selectedEventType, desc: document.getElementById('evDesc').value.trim() });
+  }
+
+  saveEvents(events);
+  closeEventModal();
+  calSelectedDate = date;
+  // Sync calendar month to event date
+  const [y,m] = date.split('-');
+  calViewYear = parseInt(y);
+  calViewMonth = parseInt(m) - 1;
+  renderBigCalendar();
+  renderSelectedDay();
+  renderUpcoming();
+  toast(editId ? '✏️ Evento atualizado!' : '📅 Evento adicionado!');}
+
+function deleteEvent(id) {
+  saveEvents(getEvents().filter(e => e.id !== id));
+  renderSelectedDay();
+  renderUpcoming();
+  renderBigCalendar();
+  toast('Evento removido');
+}
+
+// close modal clicking outside
+document.getElementById('eventModal').addEventListener('click', function(e) {
+  if (e.target === this) closeEventModal();
+});
+
+// ---- ADMIN ----
+function addCourse() {
+  const input = document.getElementById('courseInput');
+  if (!input.value.trim()) { toast('Digite o nome do curso'); return; }
+  const courses = getCourses();
+  courses.push({
+    id: Date.now(),
+    name: input.value.trim(),
+    emoji: EMOJIS[Math.floor(Math.random()*EMOJIS.length)],
+    color: courses.length % 5,
+    rating: (3.8 + Math.random()*1.2).toFixed(1)*1,
+    hours: Math.floor(Math.random()*30+10),
+    sections: Math.floor(Math.random()*4+2),
+    modules: []
+  });
+  saveCourses(courses);
+  input.value = '';
   renderAdmin();
-  renderCourses();
-
-  showToast('Módulo criado');
-
-  setTimeout(() => {
-    addLesson(courseId, course.modules.length - 1);
-  }, 300);
+  toast('🎉 Curso adicionado!');
 }
 
-function addLesson(courseId, moduleIndex) {
-  const title = prompt('Nome da aula');
+function deleteCourse(id) {
+  if (!confirm('Remover este curso?')) return;
+  saveCourses(getCourses().filter(c => c.id !== id));
+  renderAdmin();
+  toast('Curso removido');
+}
 
-  if (!title) return;
-
+function renderAdmin() {
   const courses = getCourses();
-
-  const course = courses.find(c => c.id === courseId);
-
-  course.modules[moduleIndex].lessons.push({
-    title,
-    completed: false
-  });
-
-  saveCourses(courses);
-
-  renderCourses();
-  renderDashboard();
-
-  showToast('Aula adicionada');
+  document.getElementById('adminCourses').innerHTML = courses.map(c => {
+    const p = calcProgress(c);
+    return `<div class="card">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div style="font-size:28px;">${c.emoji||'📚'}</div>
+        <div style="flex:1;">
+          <div style="font-weight:600;">${c.name}</div>
+          <div style="font-size:12px;color:var(--muted);">${c.modules.length} módulos · ${p}% concluído</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="addModule(${c.id})">+ Módulo</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteCourse(${c.id})">Remover</button>
+      </div>
+    </div>`;
+  }).join('');
 }
+
+// Initial render
+renderDashboard();
 </script>
 </body>
 </html>
